@@ -1018,7 +1018,7 @@ try {
     public static int soundFlag = 0;
     public void messageReceived(LLRPMessage message)
     {
-    	
+    	System.out.println("\n\nIn the messageReceived function\n\n");
     	String temp[] = null;
     	int tmpEPCCount = 0;
     	

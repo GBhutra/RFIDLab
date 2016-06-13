@@ -77,11 +77,6 @@ public class MyObservable extends Observable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}    
-		
-  
-  
-  
-   
  
  } }
 	});  

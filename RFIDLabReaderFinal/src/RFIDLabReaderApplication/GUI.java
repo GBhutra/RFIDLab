@@ -6,8 +6,10 @@ import org.llrp.ltk.generated.parameters.TagReportData;
 
 import controlP5.Button;
 import controlP5.ControlEvent;
+import controlP5.ControlFont;
 import controlP5.ControlP5;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PImage;
 
 /**
@@ -41,7 +43,7 @@ public class GUI extends PApplet implements Observer{
     //End of Graphics constants
     
     //the graphics index
-    PImage img[];
+    PImage asset[];
     protected String image[] = {"StopSign.png","YieldSign","streetSign","tick.png","cross.png","map.png"};
     
     //
@@ -54,6 +56,7 @@ public class GUI extends PApplet implements Observer{
 	private static ENUMS.SIGN prevSign = ENUMS.SIGN.STOP;
 	private int currAssetID;
 	private int prevAssetID;
+	private static int MAX_ASSET_ID = 51;
 	
 	
 	
@@ -97,7 +100,7 @@ public class GUI extends PApplet implements Observer{
 	   	       	 		currSign = ENUMS.SIGN.YIELD;
 	   	       	 	}
    	       	 		
-   	       	 		if(printTagRFIDObj.getAssetID()!=51)
+   	       	 		if(printTagRFIDObj.getAssetID()<MAX_ASSET_ID)
    	       	 			currAssetID = printTagRFIDObj.getAssetID();
    	       	 	}
    	       	 	else	{
@@ -109,19 +112,23 @@ public class GUI extends PApplet implements Observer{
 	}
 	
 	public void setup()	{
+		//Initializing with defaults
+		currAssetID = 1;
+		prevAssetID = 1;
 		layout = ENUMS.LAYOUT.SIMPLIFIED;
-		calculateDimensions();
-		size(WIDTH,HEIGHT);
-		
-		cp5 = new ControlP5(this);
 		reader = new RFIDReader("192.168.1.50");
 		fileHandler = new FileHandler("Riverside3.csv");
 		reader.register(this);
 		reader.register(fileHandler);
 		
+		loadImages();
+		calculateDimensions();
+		size(WIDTH,HEIGHT);
 		
-		//loadImages();
-		noStroke();
+		
+		cp5 = new ControlP5(this);
+		PFont p = createFont("Arial",20,true);
+		cp5.setFont(p);
 		
 		control_button = new Button[4];
 		for (int i=1;i<=numButtons;i++)	{
@@ -135,21 +142,42 @@ public class GUI extends PApplet implements Observer{
 		}
 		control_button[0].setSwitch(true);
 		
-		stroke(255);
-		rect(80,90,640,400);
-		rect(80,510,250,70);
-		rect(470,510,250,70);
-		PImage img = loadImage("1.png");
+		stroke(0);
+		rect(79,89,642,402);
+		rect(79,509,252,72);
+		rect(469,511,252,72);
+	
+		int width = asset[currAssetID].width;
+		int height = asset[currAssetID].height;
+		
+		if(width>height)	{	asset[currAssetID].resize(SIGN_WIDTH, Math.round(height*(SIGN_WIDTH/width)));	}
+		else	{	asset[currAssetID].resize(Math.round(width*(SIGN_HEIGHT/height)),SIGN_HEIGHT);	}
+		
 		imageMode(CENTER);
-			image(img,400,290);
+		image(asset[currAssetID],400,290);
 		imageMode(CORNER);
 	}
 	
 	public void draw() {
-		if(layout==ENUMS.LAYOUT.SIMPLIFIED)	{
+		if(prevAssetID!=currAssetID)	{
+			background(200);
+			int width = asset[currAssetID].width;
+			int height = asset[currAssetID].height;
+		
+			// Calculation to maintain Aspect ratio
+			if(width>height)	{	asset[currAssetID].resize(SIGN_WIDTH, Math.round(height*(SIGN_WIDTH/width)));	}
+			else	{	asset[currAssetID].resize(Math.round(width*(SIGN_HEIGHT/width)),SIGN_HEIGHT);	}
 			
-		}
-		else {
+			imageMode(CENTER);
+			try {	image(asset[currAssetID],400,290);	}
+			catch (Exception e)	{
+				System.out.println("ERROR loading image");
+				//image(NoimageFound)
+				e.printStackTrace();
+			}
+			
+			imageMode(CORNER);
+			prevAssetID = currAssetID;
 		}
 	}
 	
@@ -209,11 +237,17 @@ public class GUI extends PApplet implements Observer{
 	}
 	
 	public void loadImages()	{
-		img = new PImage[5];
-		for (int i=0;i<5;i++)	{
-			img[i] = loadImage(image[i]);
+		asset = new PImage[51];
+		for (int i=0;i<51;i++)	{
+			String img = i+".png";
+			try	{
+				asset[i] = loadImage(img);
+			}
+			catch (Exception e)	{
+				System.out.println("Error Loading asset "+i);
+				e.printStackTrace();
+			}
 		}
-		
 	}
 	
 	public void calculateDimensions()	{

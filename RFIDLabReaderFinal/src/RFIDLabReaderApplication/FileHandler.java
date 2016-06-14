@@ -40,7 +40,7 @@ public class FileHandler implements Observer{
 	
 	protected static HashMap<String, Integer> epcCount = new HashMap<String, Integer>();
     protected static HashMap<String, String> assetEPC = new HashMap<String, String>();
-    protected HashMap<String, RFIDObject> lifeExpMap = new HashMap<String, RFIDObject>();
+    public HashMap<String, RFIDObject> lifeExpMap = new HashMap<String, RFIDObject>();
     
 	
 	public FileHandler(String fileName) {
@@ -150,6 +150,7 @@ public class FileHandler implements Observer{
 				}
 			}
 		}
+        System.out.println("Loaded " + lifeExpMap.size() + " data entries");
         return ENUMS.STATUS.SUCCESS;
     }
     
@@ -177,99 +178,3 @@ public class FileHandler implements Observer{
 		return ENUMS.STATUS.SUCCESS;
 	}
 }
-
-
-/*
- * if(RUNNING_STATUS == 1){
-			                  stop();
-			                  System.out.println(" stop button clicked.");
-			                  PrintWriter writer = null;
-			                  String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-							try {
-								writer = new PrintWriter("RFID"+timeStamp+".txt", "UTF-8");
-							} catch (FileNotFoundException | UnsupportedEncodingException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-								System.out.println("akash : didnot write ");
-							}
-			                	 
-			                  for (Entry<String, Integer> entry : epcCount.entrySet()) {
-			                	  String key = entry.getKey();
-			                	  int value = entry.getValue();
-			                	 // System.out.println("Key is "+key+" and Value is "+value);
-			                	  writer.println("RFID File created on "+timeStamp);
-			                	  //lifeExpMap Global database, assetEPC (EPCTag, assetID)
-			                	 // RFIDObj tempFileObject = new RFIDObj();
-			                	  writer.println("Key:"+key+" #Value:"+value+" #Sign:"); //key is the RFID tag and value is the number of tags read 
-			                	  writer.close();
-			                	  
-			                	  // do stuff
-			                	}
-			                  
-			                  //saving the log of the data
-			                  String fileName = "temp.txt";
-
-			                  try {
-			                      // Assume default encoding.
-			                      FileWriter fileWriter =
-			                          new FileWriter(fileName);
-
-			                      // Always wrap FileWriter in BufferedWriter.
-			                      BufferedWriter bufferedWriter =
-			                          new BufferedWriter(fileWriter);
-
-			                      // Note that write() does not automatically
-			                      // append a newline character.
-			                      Set<String> keys = epcCount.keySet(); // the read tags
-			                      
-			                      bufferedWriter.write("Hello there,");
-			                      bufferedWriter.write(" here is some text.");
-			                      bufferedWriter.newLine();
-			                      bufferedWriter.write("We are writing");
-			                      bufferedWriter.write(" the text to the file.");
-			                      String key;
-			                      Iterator<Map.Entry<String, RFIDObj>> i = lifeExpMap.entrySet().iterator(); 
-			                      
-			                      while(i.hasNext()){
-			                          key = i.next().getKey();
-			                         
-			                          
-//			                          for ( String key : epcCount.keySet() ) {
-//			                     		 String tmpKey = key.toString().trim();
-//			                     		// tmpKey = tmpKey.substring(1, tmpKey.length());
-//			                     		 tmpKey = "0x"+tmpKey;
-//			                     		 String tmp = assetEPC.get(tmpKey);
-//			                     		 System.out.println("Akash assetEPC"+tmp + " , Key = "+tmpKey);
-//			                     		 RFIDObj rfidTmp = null;
-//			                     		 if(tmp!=null)
-//			                     			  rfidTmp = lifeExpMap.get(tmp);
-//			                     		 System.out.println("Akash key "+tmp);
-//			                          }
-			                         // System.out.println("Asset:"+key+", loc: "+lifeExpMap.get(key).x+","+lifeExpMap.get(key).y+" ,EPC:"+(String) lifeExpMap.get(key).epcTag+" ,Sign:"+(String)lifeExpMap.get(key).sign);
-			                          bufferedWriter.write( padRight(key.toString(), 5) +padRight((String) lifeExpMap.get(key).epcTag ,45)+padRight((String) lifeExpMap.get(key).sign ,55));
-			                          bufferedWriter.newLine();
-			                      }
-
-			                      // Always close files.
-			                      bufferedWriter.close();
-			                  }
-			                  catch(IOException ex) {
-			                      System.out.println(
-			                          "Error writing to file '"
-			                          + fileName + "'");
-			                      // Or we could just do this:
-			                      // ex.printStackTrace();
-			                  }
-			                  
-			                  
-			                  
-			                  
-			                 
-			                  }
-			                  //0xe300833b2ddd9014035050000
-			                   controlP5.remove(event.getController().getName());
-			                }
-			                
-						
-
- */

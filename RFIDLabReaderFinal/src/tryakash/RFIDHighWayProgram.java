@@ -466,7 +466,6 @@ public class RFIDHighWayProgram extends PApplet implements LLRPEndpoint, Observe
         lifeExpMap = loadLifeExpectancyFromCSV("Riverside3.csv");
         println("Loaded " + lifeExpMap.size() + " data entries");
         Location loc; 
-        //ImageMarker marker;
         SimplePointMarker pointMarker;
         String key;
         Iterator<Map.Entry<String, RFIDObj>> i = lifeExpMap.entrySet().iterator(); 

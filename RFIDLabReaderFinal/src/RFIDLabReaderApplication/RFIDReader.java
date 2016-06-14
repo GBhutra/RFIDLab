@@ -59,14 +59,12 @@ public class RFIDReader	implements LLRPEndpoint	{
 	private ENUM_STATUS status;
 	private static final int TIMEOUT_MS = 10000;
 	private static final int ROSPEC_ID = 123;
-	private int numOfReadTags;
-	private java.util.Vector observers = new java.util.Vector();
+	private java.util.Vector<Observer> observers = new java.util.Vector<Observer>();
 
 	public RFIDReader(String ip)	{
 		IpAddress = ip;
 		reader = new LLRPConnector(this, IpAddress);
 		status = ENUM_STATUS.STOP;
-		numOfReadTags = 0;
 	}
 	
 	public void register( Observer obs )	{ 

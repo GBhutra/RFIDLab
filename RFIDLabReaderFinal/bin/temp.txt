@@ -1,5 +1,6 @@
 Hello there, here is some text.
-We are writing the text to the file.44   0xe20021002000585313c60272                   Yield  ** Avenue A - Third St                          
+We are writing the text to the file.
+44   0xe20021002000585313c60272                   Yield  ** Avenue A - Third St                          
 45   0xe200210020005843156e0272                   Yield ** Avenue A - Third St                           
 46   0xe200210020005156147d0272                   Yield ** Avenue A - Third St                           
 47   0xe200210020005351150f0272                   Street: Second St ** Second St - Avenue A              

@@ -16,22 +16,17 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.llrp.ltk.generated.parameters.TagReportData;
 
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import processing.core.PApplet.*;
-
-
-
 /**
  * @author Ghanshyam
  *
  */
-public class FileHandler implements Observer{
+public class FileHandler implements ObserverBase{
 	/**
 	 * This class should handle all the thing related to the files. 
 	 * Read the tags on start, update the hash when a tag is read
@@ -91,7 +86,6 @@ public class FileHandler implements Observer{
 
             // Note that write() does not automatically
             // append a newline character.
-            Set<String> keys = epcCount.keySet(); // the read tags
             
             bufferedWriter.write("Hello there,");
             bufferedWriter.write(" here is some text.");

@@ -1,4 +1,4 @@
-package tryakash;
+package RFIDLabReaderApplication;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -47,6 +47,7 @@ public class MyObservable extends Observable {
 			e.printStackTrace();
 		}       
 		String sentence = new String( receivePacket.getData());   
+		System.out.println("GPS received sentence="+sentence);
 		//notifyObservers(new String(sentence));
 		//System.out.println("RECEIVED: " + sentence); 
 		setChanged();
@@ -55,19 +56,25 @@ public class MyObservable extends Observable {
 //		String[] arraySplit = sentence.split(",");
 //		
 //		notifyObservers(new String(arraySplit[3]+","+arraySplit[4])); //user defined GPS
+		
 		String[] arraySplit = sentence.split(",");
-		if(arraySplit[0].trim().equalsIgnoreCase("G") || arraySplit[0].trim().equalsIgnoreCase("N") ){
+		/*if(arraySplit[0].trim().equalsIgnoreCase("G") || arraySplit[0].trim().equalsIgnoreCase("N") ){
 		GPSLong = arraySplit[5].substring(1, 2) + arraySplit[5].substring(3, arraySplit[5].length());
 		GPSLat = arraySplit[4].substring(2, arraySplit[4].length());
  	
 		
-		//notifyObservers(new String(GPSLat +","+ GPSLong));
+		//
 		//notifyObservers(new String(sentence));
-	}
+	}*/
 		//System.out.println("lat is "+GPSLat+" and long is "+GPSLong);
+		GPSLat = arraySplit[0];
+		GPSLong = arraySplit[1];
+		notifyObservers(new String(GPSLat +","+ GPSLong));
+		
 		
 		InetAddress IPAddress = receivePacket.getAddress();       
 		int port = receivePacket.getPort();            
+		System.out.println("GPS Value Read from IP="+IPAddress+" port="+port+" lat="+GPSLat+" long="+GPSLong);
 		String capitalizedSentence = sentence.toUpperCase();        
 		sendData = capitalizedSentence.getBytes();                   
 		DatagramPacket sendPacket =new DatagramPacket(sendData, sendData.length, IPAddress, port);
@@ -76,6 +83,7 @@ public class MyObservable extends Observable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			serverSocket.close();
 		}    
  
  } }

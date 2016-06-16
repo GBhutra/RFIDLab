@@ -1,6 +1,12 @@
+/**
+ * 
+ */
 package RFIDLabReaderApplication;
 import org.llrp.ltk.generated.parameters.TagReportData;
-
-public interface Observer {	
+/**
+ * @author Ghanshyam
+ *
+ */
+public interface ObserverBase {
 	ENUMS.STATUS update(TagReportData Tag);
 }

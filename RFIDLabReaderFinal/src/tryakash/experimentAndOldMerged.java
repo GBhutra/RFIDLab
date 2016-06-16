@@ -37,6 +37,7 @@ import org.llrp.ltk.types.*;
 import com.jogamp.common.util.RunnableExecutor.CurrentThreadExecutor;
 import com.jogamp.opengl.util.av.AudioSink.AudioFormat;
 
+import RFIDLabReaderApplication.MyObservable;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.GeoJSONReader;
 import de.fhpotsdam.unfolding.geo.Location;

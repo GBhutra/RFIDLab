@@ -59,7 +59,7 @@ public class RFIDReader	implements LLRPEndpoint	{
 	private ENUM_STATUS status;
 	private static final int TIMEOUT_MS = 10000;
 	private static final int ROSPEC_ID = 123;
-	private java.util.Vector<Observer> observers = new java.util.Vector<Observer>();
+	private java.util.Vector<ObserverBase> observers = new java.util.Vector<ObserverBase>();
 
 	public RFIDReader(String ip)	{
 		IpAddress = ip;
@@ -67,7 +67,7 @@ public class RFIDReader	implements LLRPEndpoint	{
 		status = ENUM_STATUS.STOP;
 	}
 	
-	public void register( Observer obs )	{ 
+	public void register( ObserverBase obs )	{ 
 		observers.addElement( obs ); 
 	}
 
@@ -142,7 +142,7 @@ public class RFIDReader	implements LLRPEndpoint	{
             // Loop through the list and get the EPC of each tag and update the Observers.
             for (TagReportData tag : tags)	{
             	for (java.util.Enumeration e=observers.elements(); e.hasMoreElements(); )	{
-        			if(((Observer)e.nextElement()).update(tag) == ENUMS.STATUS.SUCCESS)	{
+        			if(((ObserverBase)e.nextElement()).update(tag) == ENUMS.STATUS.SUCCESS)	{
         				System.out.println(" Update successful!!");
         			}
         			else	{

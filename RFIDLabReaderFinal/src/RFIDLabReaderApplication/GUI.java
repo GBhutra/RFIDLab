@@ -1,14 +1,19 @@
 package RFIDLabReaderApplication;
 
+import java.awt.List;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.llrp.ltk.generated.parameters.TagReportData;
 
 import controlP5.Button;
 import controlP5.ControlEvent;
 import controlP5.ControlP5;
+import controlP5.ListBox;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.Marker;
@@ -21,18 +26,21 @@ import de.fhpotsdam.unfolding.utils.MapUtils;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
+import tryakash.ImageMarker;
 
 /**
  * @author Ghanshyam
  *
  */
 
-public class GUI extends PApplet implements Observer{	
+public class GUI extends PApplet implements ObserverBase, Observer{	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	ControlP5 cp5;
+	ListBox textOutput;
+	
 	//The following values are graphics related
     public static int WIDTH 	= 800;
     public static int HEIGHT 	= 600;
@@ -67,7 +75,7 @@ public class GUI extends PApplet implements Observer{
     
     
     public static int numButtons = 4;
-	public String[]  Button= {"Start", "Advanced", "Save", "Exit"};
+	public String[]  Button= {"Start", "MAP", "Save", "Exit"};
 	public static Button[] control_button;
 	
 	private static ENUMS.SIGN currSign = ENUMS.SIGN.STOP;
@@ -81,11 +89,21 @@ public class GUI extends PApplet implements Observer{
 	protected MarkerManager<Marker> markerManager;
 	
 	
+	//GPS Based location
+	private MyObservable gpsData;
+	private String GPSLat;
+	private String GPSLong;
+	private boolean updateCurrLoc = false;
+	private int statusMarkerManager = 0;
+	
 	//RFID Reader object
 	protected RFIDReader reader;
 	
 	//File Handler object
 	protected FileHandler fileHandler;
+	
+	//Variable which has the status of the application 
+	private boolean isStatusChecked = false; 
 	
 	// From here onwards all the methods are defined.
 	public GUI() {
@@ -128,7 +146,7 @@ public class GUI extends PApplet implements Observer{
    	       	 			currAssetID = printTagRFIDObj.getAssetID();
    	       	 	}
    	       	 	else	{
-   	       	 		System.out.println("Error No Asset Available for the TagID:"+readRFIDTag);
+   	       	 		System.out.println("ERROR: No Asset Available for the TagID:"+readRFIDTag);
    	       	 		return ENUMS.STATUS.FAILURE;
    	       	 	}
     		}
@@ -143,11 +161,16 @@ public class GUI extends PApplet implements Observer{
 		layout = ENUMS.LAYOUT.SIMPLIFIED;
 		reader = new RFIDReader("192.168.1.50");
 		fileHandler = new FileHandler("Riverside3.csv");
+		gpsData = new MyObservable();
+		gpsData.addObserver(this);
 		reader.register(this);
 		reader.register(fileHandler);
 		
+		stroke(100);
+		rect(0,0,800,600);
 		layoutTransitionTo(layout);
 		size(WIDTH,HEIGHT,P3D);
+		gpsData.sum(3, 4);
 		
 		// Top button bar
 		cp5 = new ControlP5(this);
@@ -170,7 +193,6 @@ public class GUI extends PApplet implements Observer{
 		System.out.println("Top Buttons Loaded");
 		
 		//Map setup
-		
 		AbstractMapProvider provider = new Google.GoogleMapProvider();
 		int zoomLevel = 15;
 		boolean offline = false;
@@ -192,13 +214,10 @@ public class GUI extends PApplet implements Observer{
         while(i.hasNext()){
             key = i.next().getKey();
             System.out.println("Asset:"+key+", loc: "+fileHandler.lifeExpMap.get(key).getX()+","+fileHandler.lifeExpMap.get(key).getY()+" ,EPC:"+(String) fileHandler.lifeExpMap.get(key).getEpcTag()+" ,Sign:"+(String)fileHandler.lifeExpMap.get(key).getSign());
-            
-            //List Box
-            //if(layout==ENUMS.LAYOUT.SIMPLIFIED)
-            //	lbCSV.addItem( padRight(key.toString(), 5) +padRight((String) lifeExpMap.get(key).epcTag ,45)+padRight((String) lifeExpMap.get(key).sign ,55), Integer.parseInt(key));
          
            loc = new Location(fileHandler.lifeExpMap.get(key).getX(), fileHandler.lifeExpMap.get(key).getY());
            pointMarker = new SimplePointMarker(loc);
+           pointMarker.setRadius(5.0f);
            String tmpSign = (String)fileHandler.lifeExpMap.get(key).getSign();
             tmpSign = tmpSign.substring(0,4);
           
@@ -227,7 +246,14 @@ public class GUI extends PApplet implements Observer{
 	
 	public void draw() {
 		if(prevAssetID!=currAssetID)	{
-			background(200);
+			if(layout==ENUMS.LAYOUT.SIMPLIFIED)	{
+				fill(250);
+				rect(79,89,642,492);
+			}
+			else	{
+				fill(250);
+				rect(19,89,372,492);
+			}
 			imageMode(CENTER);
 			try {	image(asset[currAssetID],SIGN_CENTER_X,SIGN_CENTER_Y);	}
 			catch (Exception e)	{
@@ -249,14 +275,40 @@ public class GUI extends PApplet implements Observer{
             prevAssetID = currAssetID;
 		}
 		if(layout==ENUMS.LAYOUT.ADVANCED)	{
+			if (true==updateCurrLoc )	{
+				Location loc =  new Location(Double.parseDouble(GPSLat),Double.parseDouble(GPSLong));
+				SimplePointMarker pM = new SimplePointMarker(loc);
+	    		pM.setRadius(2);
+	    		pM.setColor(color(255, 0, 0, 30));
+	         
+	    		ImageMarker iM = new ImageMarker(loc, loadImage("car.png"));
+	    		
+	    		if(statusMarkerManager == 0){
+	    			markerManager.clearMarkers();
+	    			markerManager.addMarker(iM);
+	    			try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    			statusMarkerManager = 1;
+	    		}else{
+	    			markerManager.clearMarkers();
+	    			statusMarkerManager = 0;
+	    			markerManager.addMarker(iM);
+	    			statusMarkerManager = 0;
+	    		}
+				updateCurrLoc = false;
+			}
 			map.draw();
 		}
 	}
 	
 	public void controlEvent(ControlEvent theEvent) {
 		  System.out.println("Button clicked");
-		  switch(theEvent.getController().getName())	{
-		  	case "Start":
+		  switch(theEvent.getController().getId())	{
+		  	case 1:
 		  		if("Start"==theEvent.getController().getLabel())	{
 					  theEvent.getController().setLabel("Stop");
 					  System.out.println("Starting the reader");
@@ -267,23 +319,23 @@ public class GUI extends PApplet implements Observer{
 					  reader.stopReader();
 				}
 		  	break;
-		  	case "Advanced":
-		  		if("Advanced"==theEvent.getController().getLabel())	{
+		  	case 2:
+		  		if("MAP"==theEvent.getController().getLabel())	{
 		  			  System.out.println("Changing the layout from simplified -> advanced");
-					  theEvent.getController().setLabel("Simplified");
+					  theEvent.getController().setLabel("No MAP");
 					  layoutTransitionTo(ENUMS.LAYOUT.ADVANCED);
 				}	else	{
 					  System.out.println("Changing the layout from advanced -> simplified");
-					  theEvent.getController().setLabel("Advanced");
+					  theEvent.getController().setLabel("MAP");
 					  layoutTransitionTo(ENUMS.LAYOUT.SIMPLIFIED);
 				}
 		  	break;
-		  	case "Exit":
+		  	case 4:
 		  		System.out.println("Exit button clicked");
 		  		System.out.println("Buh bye......");
 		  		System.exit(0);
 		  	break;
-		  	case "Save":
+		  	case 3:
 		  		System.out.println("Save button clikled");
 		  		if(ENUMS.STATUS.SUCCESS == fileHandler.saveLog())	{
 		  			System.out.println("File saved successfully");
@@ -312,34 +364,36 @@ public class GUI extends PApplet implements Observer{
 		imageMode(CENTER);
 		if(lay == ENUMS.LAYOUT.SIMPLIFIED)	{
 			frameRate(10);
-			rect(79,89,642,402);
+			rect(79,89,642,492);
 			rect(79,509,252,72);
 			rect(469,511,252,72);
-			image(asset_check,205,545);
-			image(asset_cross,595,545);
+			//image(asset_check,205,545);
+			//image(asset_cross,595,545);
 			
 		}
 		else	{
-			frameRate(30);
-			rect(19,89,372,402);
+			frameRate(60);
+			rect(19,89,372,492);
 			rect(19,509,172,72);
 			rect(219,509,172,72);
 			rect(409,89,372,237);
 			rect(409,344,372,237);
 			
-			image(asset_check,105,545);
-			image(asset_cross,305,545);
-			image(asset_map_bg,595,208);
+			//image(asset_check,105,545);
+			//image(asset_cross,305,545);
+			image(asset_map_bg,595,335);
 
 		}
-		
-		image(asset[currAssetID],SIGN_CENTER_X,SIGN_CENTER_Y);
-		System.out.println("\n\n Asset "+currAssetID+" before setting :width="+asset[currAssetID].width+" height="+asset[currAssetID].height);
+		if(0>currAssetID || MAX_ASSET_ID<=currAssetID)
+			image(asset_error,SIGN_CENTER_X,SIGN_CENTER_Y);
+		else
+			image(asset[currAssetID],SIGN_CENTER_X,SIGN_CENTER_Y);
 		imageMode(CORNER);
+		layout = lay;
 	}
 	
 	public void loadImages()	{
-		//if(null==asset)	{
+		if(null==asset)	{
 			asset = new PImage[MAX_ASSET_ID];
 			asset_map_bg = new PImage();
 			asset_text_bg = new PImage();
@@ -347,9 +401,9 @@ public class GUI extends PApplet implements Observer{
 			asset_cross = new PImage();
 			asset_logo = new PImage();
 			asset_error = new PImage();
-		//}
+		}
 	
-		for (int i=0;i<MAX_ASSET_ID;i++)	{
+		for (int i=0;i<MAX_ASSET_ID-1;i++)	{
 			String img = i+".png";
 			try	{
 				asset[i] = loadImage(img);
@@ -360,6 +414,7 @@ public class GUI extends PApplet implements Observer{
 				e.printStackTrace();
 			}
 		}
+		asset[MAX_ASSET_ID-1] = loadImage("test.GIF");
 		try	{
 			asset_map_bg 	=loadImage("bg_map.png");
 			//asset_text_bg	=loadImage();
@@ -376,41 +431,41 @@ public class GUI extends PApplet implements Observer{
 	
 	//This method calculates the size of the objects to be created. 
 	public void calculateDimensions(ENUMS.LAYOUT lay)	{
-		System.out.println("CatculateDimensions invoked for "+lay+" loyout");
-		float ratio = 0.0f;
 		BUTTON1_WIDTH = Math.round(150*(WIDTH/800));
 		BUTTON1_HEIGHT = Math.round(50*(HEIGHT/600));
 		
 		MAP_WIDTH = Math.round(370*(WIDTH/800));
-		MAP_HEIGHT = Math.round(235*(HEIGHT/600));
+		MAP_HEIGHT = Math.round(490*(HEIGHT/600));
 		
-		SIGN_HEIGHT = Math.round(400*(HEIGHT/600));
+		SIGN_HEIGHT = Math.round(490*(HEIGHT/600));
+		
 		
 		if(lay == ENUMS.LAYOUT.SIMPLIFIED)	{
 			SIGN_WIDTH = Math.round(640*(WIDTH/800));
-		
+			SIGN_HEIGHT = Math.round(400*(HEIGHT/600));
+			
 			BUTTON2_WIDTH = Math.round(250*(WIDTH/800));
 			BUTTON2_HEIGHT = Math.round(70*(HEIGHT/600));
 			
 			SIGN_CENTER_X = 400;
-		    SIGN_CENTER_Y = 290;
+		    SIGN_CENTER_Y = 335;
 		}
 		else	{	
 			SIGN_WIDTH = Math.round(370*(WIDTH/800));
+			
 	
 			BUTTON2_WIDTH = Math.round(170*(WIDTH/800));
 			BUTTON2_HEIGHT = Math.round(70*(HEIGHT/600));
 			
 			SIGN_CENTER_X = 205;
-			SIGN_CENTER_Y = 290;
+			SIGN_CENTER_Y = 335;
 		}
-		System.out.println("\n\n Asset :width="+SIGN_WIDTH+" height="+SIGN_HEIGHT);
 		loadImages();
 		for (int i=0;i<MAX_ASSET_ID;i++)	{
 				asset[i] = resizeToFit(asset[i], SIGN_WIDTH, SIGN_HEIGHT);
 		}
 		
-		asset_error = resizeToFit(asset_error, SIGN_WIDTH, SIGN_WIDTH);
+		asset_error = resizeToFit(asset_error, SIGN_WIDTH, SIGN_HEIGHT);
 		asset_check =  resizeToFit(asset_check,BUTTON2_WIDTH,BUTTON2_HEIGHT);
 		asset_cross =  resizeToFit(asset_cross,BUTTON2_WIDTH,BUTTON2_HEIGHT);
 		asset_map_bg = resizeToFit(asset_map_bg,MAP_WIDTH,MAP_HEIGHT);
@@ -441,5 +496,22 @@ public class GUI extends PApplet implements Observer{
 	
 	private String padRight(String s, int n) {
 	     return String.format("%1$-" + n + "s", s);  
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		// TODO Auto-generated method stub
+		 System.out.println("Observer Notified:" + " " + arg);
+		 
+		  if(arg.toString().length()>5){
+			  //STATUS_GPS_DRAW = 1;
+			  String[] observerGPS = arg.toString().split(",");
+			  if (GPSLong!=observerGPS[1] || GPSLat!=observerGPS[0])	{
+				  updateCurrLoc = true;
+			  }
+			  GPSLat = observerGPS[0];
+			  GPSLong = observerGPS[1];
+			  
+		  }
 	}
 }

@@ -35,6 +35,7 @@ import org.llrp.ltk.types.*;
 import com.jogamp.common.util.RunnableExecutor.CurrentThreadExecutor;
 import com.jogamp.opengl.util.av.AudioSink.AudioFormat;
 
+import RFIDLabReaderApplication.MyObservable;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.GeoJSONReader;
 import de.fhpotsdam.unfolding.geo.Location;
@@ -92,7 +93,7 @@ public class RFIDHighWayProgram extends PApplet implements LLRPEndpoint, Observe
    // public static int gpsStatus = 0;
       
     ControlP5 controlP5;
-    boolean definedListBox = false;
+    boolean definedListBox = true;
      
     ListBox lbCSV;
     	 
@@ -186,7 +187,8 @@ public class RFIDHighWayProgram extends PApplet implements LLRPEndpoint, Observe
     	
     	
     	 if(definedListBox){
-    	 lbCSV = controlP5.addListBox("Asset No & EPC Tag",800+160,20,360+50,560); //addListBox(name,x,y,width,height)
+    	 lbCSV = controlP5.addListBox("Asset No & EPC Tag",800+160,20,360+50,560); 
+    	 //addListBox(name,x,y,width,height)
     	 }
     	// ListBox lbCSVSign = controlP5.addListBox("Sign",800+160+120,20,120,560);
     	// ListBox lbCSVRead = controlP5.addListBox("Read (Yes/No)",800+160+240,20,120,560);
@@ -492,6 +494,7 @@ public class RFIDHighWayProgram extends PApplet implements LLRPEndpoint, Observe
             //marker = new ImageMarker(loc, loadImage("ui/marker.png"));
            // map.addMarkers(marker);
             pointMarker = new SimplePointMarker(loc);
+            pointMarker.setRadius(5.0f);
             //change sign
             String tmpSign = (String)lifeExpMap.get(key).sign;
             tmpSign = tmpSign.substring(0,4);

@@ -1,0 +1,36 @@
+doctype html
+html(lang="en")
+	head
+		title= "RFID Highway Application"
+		script(src='javascript/main_page.js')
+		script(src='/socket.io/socket.io.js')
+		style
+			include css/skeleton.css
+			include css/normalize.css
+			include css/style.css
+	body
+		#content
+			table.controls
+				tr
+					th: button.button-primary(id='start') Start
+					th: button.button-primary(id='layout') Layout
+					th: button.button-primary(id='save') Save
+					th: button.button-primary(id='exit') Exit
+			#sign.container.u-max-full-width
+				if 3==numSigns
+					#asset.container
+						img(id='image' src='assets/1.png')
+				else if 2==numSigns
+					#asset.container
+			
+			script.
+				var im = document.getElementById("image");
+				im.onload = function() {
+					console.log("Image loaded width:"+im.width+" height:"+im.height);
+					if(im.height>=im.width)	{
+						im.height = document.getElementById("sign").offsetHeight-40;
+					}
+					else {
+						im.width = document.getElementById("asset").offsetWidth-40;
+					}
+				}

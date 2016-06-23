@@ -3,25 +3,62 @@ table.controls	{
 	overflow-x:auto;
 }
 
-table.controls,th,td	{
+table.controls th	{
 	padding: 1%;
 	/*border-style: solid;*/
 	text-align: center;
 	vertical-align: center;	
 }
 
-#layout_1 {
+#sign_container	{
+	height: 500px;
+}
+
+
+#sign1 {
+	padding: 5px;
 	display: flex;
 	align-items: center;
-	border-style: dotted;
-	background-color: green;
-	height: 510px;
+	justify-content: center;
+	background-color: white;
+	height: 100%;
 }
+
+#sign2 {
+	padding: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: white;
+	height: 100%;
+}
+
+#sign3 {
+	padding: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: white;
+	height: 100%;
+}
+
 #asset {
 	background-color: white;
 	background-blend-mode: multiply;
 	vertical-align: center;
 	text-align: center;
+}
+
+table {
+	width:100%;
+	overflow-x:auto;
+	table-layout: fixed;
+	height:100%;
+}
+
+table.sign th {
+	height:100%;
+	width:1%;
 }
 /*
 #content {

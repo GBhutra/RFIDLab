@@ -1,32 +1,27 @@
 table.controls	{
-	margin:1%;
 	width:100%;
+	overflow-x:auto;
 }
 
 table.controls,th,td	{
+	padding: 1%;
+	/*border-style: solid;*/
 	text-align: center;
-	padding-bottom: 1%;
+	vertical-align: center;	
 }
 
-table.controls, text-decoration{
-	margin:1%;
-}
-
-#sign {
+#layout_1 {
 	display: flex;
 	align-items: center;
 	border-style: dotted;
 	background-color: green;
-	min-height: 525px;
-	max-height: 525px;
-	height:auto;
+	height: 510px;
 }
 #asset {
 	background-color: white;
 	background-blend-mode: multiply;
 	vertical-align: center;
 	text-align: center;
-	height:96%;
 }
 /*
 #content {

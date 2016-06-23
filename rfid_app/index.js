@@ -1,13 +1,14 @@
 var express = require("express");
 var app = express();
 var port = 3700;
-var numSigns = 3;
+var assets = [0];
+console.log("asset size="+assets.length);
 
 app.set('views', __dirname + '/views');
 app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
 app.get("/", function(req, res){
-    res.render("main_page");
+    res.render("main_page",{numSigns: assets});
 });
 app.use(express.static(__dirname + '/public'));
 
@@ -25,6 +26,8 @@ io.sockets.on('connection', function (socket) {
         socket.emit('message',data);
     });
     socket.on('layout', function (data) {
+        assets=[0,1];
+        console.log("asset size="+assets.length);
         socket.emit('message',data);
     });
     socket.on('exit', function (data) {

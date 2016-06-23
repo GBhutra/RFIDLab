@@ -16,21 +16,19 @@ html(lang="en")
 					th: button.button-primary(id='layout') Layout
 					th: button.button-primary(id='save') Save
 					th: button.button-primary(id='exit') Exit
-			#sign.container.u-max-full-width
-				if 3==numSigns
+			#sign
+				#layout_1.container.u-max-full-width
 					#asset.container
 						img(id='image' src='assets/1.png')
-				else if 2==numSigns
-					#asset.container
-			
+
 			script.
 				var im = document.getElementById("image");
 				im.onload = function() {
 					console.log("Image loaded width:"+im.width+" height:"+im.height);
 					if(im.height>=im.width)	{
-						im.height = document.getElementById("sign").offsetHeight-40;
+						im.height = document.getElementById("layout_1").offsetHeight-40;
 					}
-					else {
+					else	{
 						im.width = document.getElementById("asset").offsetWidth-40;
 					}
 				}

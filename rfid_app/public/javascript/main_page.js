@@ -19,6 +19,8 @@ window.onload = function() {
             content.innerHTML = html;
         } else {
             //console.log("There is a problem:", data);
+            if(data=="Change the layout")
+               location.reload();
             content.innerHTML = data;
         }
 
